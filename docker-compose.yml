@@ -1,17 +1,17 @@
 version: '3.8'
 
 services:
-  csharp-learning-hub:
-    build: .
+  learning-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
-      - "9056:3000"
+      - "9056:9056"
+    restart: unless-stopped
+    container_name: learning-app
     environment:
       - NODE_ENV=production
-    restart: unless-stopped
-    container_name: csharp-learning-hub
-    networks:
-      - app-network
 
 networks:
-  app-network:
-    driver: bridge
+  default:
+    name: learning-network
