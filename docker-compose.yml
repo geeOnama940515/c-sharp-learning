@@ -7,7 +7,7 @@ services:
       dockerfile: Dockerfile
       target: runner  # Build up to the final stage
     ports:
-      - "9056:9056"
+      - "9056:3000"
     container_name: learning-app
     restart: unless-stopped
     environment:
