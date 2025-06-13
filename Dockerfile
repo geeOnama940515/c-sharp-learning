@@ -1,46 +1,53 @@
-# Use the official Node.js 18 image as base
+# 1. Base image with Node.js
 FROM node:18-alpine AS base
 
-# Install dependencies only when needed
-FROM base AS deps
+# Set working directory
+WORKDIR /app
+
+# Install required dependencies for building native modules (if any)
 RUN apk add --no-cache libc6-compat
-WORKDIR /app
 
-# Install dependencies based on the preferred package manager
-COPY package.json package-lock.json* ./
-RUN npm ci --only=production && npm cache clean --force
+# 2. Install dependencies
+FROM base AS deps
 
-# Rebuild the source code only when needed
+# Copy only the package files to install dependencies
+COPY package.json package-lock.json ./
+RUN npm ci
+
+# 3. Build the application
 FROM base AS builder
-WORKDIR /app
+
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Next.js collects completely anonymous telemetry data about general usage.
+# Disable telemetry
 ENV NEXT_TELEMETRY_DISABLED 1
 
-# Build the application
+# Build the app
 RUN npm run build
 
-# Production image, copy all the files and run next start
+# 4. Prepare production image
 FROM base AS runner
+
+# Create app user
+RUN addgroup --system --gid 1002 nodejs && \
+    adduser --system --uid 1002 nextjs
+
 WORKDIR /app
 
 ENV NODE_ENV production
 ENV NEXT_TELEMETRY_DISABLED 1
 
-RUN addgroup --system --gid 1002 nodejs
-RUN adduser --system --uid 1002 nextjs
-
-# Copy the built application
-COPY --from=builder /app/out ./out
+# Copy necessary files
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
-
-# Since we're using static export, we\'ll serve the files with a simple HTTP server
-RUN npm install -g serve
+COPY --from=builder /app/next.config.js ./next.config.js
 
 USER nextjs
 
 EXPOSE 9056
 
-CMD ["serve", "-s", "out", "-l", "9056"]
+# Start the Next.js app
+CMD ["npm", "start"]
