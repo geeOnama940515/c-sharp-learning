@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  csharp-learning-hub-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "9056:3000"
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+    restart: unless-stopped
+    container_name: csharp-learning-hub-dev
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
