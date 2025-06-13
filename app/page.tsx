@@ -5,7 +5,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Progress } from '@/components/ui/progress';
 import { BookOpen, Code, Search, Star, Trophy, ChevronRight, Play, CheckCircle } from 'lucide-react';
 import Link from 'next/link';
 
@@ -182,7 +181,6 @@ export default function Home() {
 
   const completedTopics = topics.filter(topic => topic.completed).length;
   const totalTopics = topics.length;
-  const progressPercentage = (completedTopics / totalTopics) * 100;
 
   const getDifficultyColor = (difficulty: number) => {
     switch (difficulty) {
@@ -230,33 +228,6 @@ export default function Home() {
       </header>
 
       <main className="container mx-auto px-4 py-8">
-        {/* Progress Overview */}
-        <div className="mb-8">
-          <Card className="bg-gradient-to-r from-blue-500 to-purple-600 text-white border-0">
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Star className="h-5 w-5" />
-                <span>Learning Progress</span>
-              </CardTitle>
-              <CardDescription className="text-blue-100">
-                Track your journey through C# concepts
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span>Overall Progress</span>
-                  <span>{Math.round(progressPercentage)}%</span>
-                </div>
-                <Progress value={progressPercentage} className="bg-blue-400" />
-                <p className="text-sm text-blue-100 mt-2">
-                  Great work! Keep learning to unlock more advanced topics.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
         {/* Search and Filters */}
         <div className="mb-8 space-y-4">
           <div className="relative">
